@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Իմ Ռեալ Պրոյեկտը</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        input, button { padding: 10px; margin: 5px; }
+    </style>
+</head>
+<body>
+
+    <h2>Ավելացնել նոր To-Do</h2>
+    <input type="text" id="taskInput" placeholder="Գրիր անելիքդ...">
+    <button onclick="sendDataToBackend()">Ուղարկել Սերվերին</button>
+    <hr>
+    <button onclick="fetchTodos()">Բեռնել բոլոր անելիքները</button>
+    <ul id="todosContainer"></ul>
+
+    <h3 id="statusMessage" style="color: green;"></h3>
+
+    <script>
+        function sendDataToBackend() {
+           
+            const taskText = document.getElementById("taskInput").value;
+
+            const newTodo = {
+                id: Math.floor(Math.random() * 1000),  
+                task: taskText,
+                completed: false
+            };
+
+            fetch('http://localhost:4000/api/todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newTodo) 
+            })
+            .then(response => response.json())
+            .then(data => {
+                
+                document.getElementById("statusMessage").innerText = data.message;
+                document.getElementById("taskInput").value = ""; 
+            })
+            .catch(error => console.error("Սխալ կայացավ:", error));
+        }
+
+
+        function fetchTodos(){
+            fetch('http://localhost:4000/api/todos')
+            .then(response => response.json())
+            .then(data => {
+                const todosContainer = document.getElementById("todosContainer");
+                todosContainer.innerHTML = "";
+                data.forEach(todo => {
+                    const li = document.createElement("li");
+                    li.textContent = todo.task;
+
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.innerText = "Ջնջել";
+                    deleteBtn.style.marginLeft = "15px";
+                    deleteBtn.style.color = "red";
+                    deleteBtn.onclick = () => deleteTodoFromServer(todo.id);
+                    li.appendChild(deleteBtn);
+                    todosContainer.appendChild(li);
+                });
+            })
+            .catch(error => console.error("Սխալ կայացավ:", error));
+        }
+
+    async function deleteTodoFromServer(todoId) {
+   
+    const isConfirmed = confirm("Վստա՞հ ես, որ ուզում ես ջնջել այս առաջադրանքը:");
+    if (!isConfirmed) return; 
+
+    try {
+        const response = await fetch(`http://localhost:4000/api/todos/${todoId}`, {
+            method: "DELETE" 
+        });
+
+        if (response.ok) {
+            console.log("Հաջողությամբ ջնջվեց բազայից");
+
+            fetchTodos(); 
+        } else {
+            console.error("Սերվերը մերժեց ջնջելը");
+        }
+    } catch (err) {
+        console.error("Կապի սխալ:", err);
+    }
+}
+    </script>
+</body>
+</html>
