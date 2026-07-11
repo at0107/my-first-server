@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Իմ Ռեալ Պրոյեկտը</title>
+    <title>Todo App</title>
     <style>
         body { font-family: sans-serif; padding: 20px; }
         input, button { padding: 10px; margin: 5px; }
@@ -10,11 +10,11 @@
 </head>
 <body>
 
-    <h2>Ավելացնել նոր To-Do</h2>
+    <h2>Add New Todo</h2>
     <input type="text" id="taskInput" placeholder="Գրիր անելիքդ...">
-    <button onclick="sendDataToBackend()">Ուղարկել Սերվերին</button>
+    <button onclick="sendDataToBackend()">Send to server</button>
     <hr>
-    <button onclick="fetchTodos()">Բեռնել բոլոր անելիքները</button>
+    <button onclick="fetchTodos()">Load all todos</button>
     <ul id="todosContainer"></ul>
 
     <h3 id="statusMessage" style="color: green;"></h3>
@@ -43,7 +43,7 @@
                 document.getElementById("statusMessage").innerText = data.message;
                 document.getElementById("taskInput").value = ""; 
             })
-            .catch(error => console.error("Սխալ կայացավ:", error));
+            .catch(error => console.error("Failed to send:", error));
         }
 
 
@@ -58,7 +58,7 @@
                     li.textContent = todo.task;
 
                     const deleteBtn = document.createElement("button");
-                    deleteBtn.innerText = "Ջնջել";
+                    deleteBtn.innerText = "Delete";
                     deleteBtn.style.marginLeft = "15px";
                     deleteBtn.style.color = "red";
                     deleteBtn.onclick = () => deleteTodoFromServer(todo.id);
@@ -66,12 +66,12 @@
                     todosContainer.appendChild(li);
                 });
             })
-            .catch(error => console.error("Սխալ կայացավ:", error));
+            .catch(error => console.error("Failed:", error));
         }
 
     async function deleteTodoFromServer(todoId) {
    
-    const isConfirmed = confirm("Վստա՞հ ես, որ ուզում ես ջնջել այս առաջադրանքը:");
+    const isConfirmed = confirm("Are you sure to delete this todo?:");
     if (!isConfirmed) return; 
 
     try {
@@ -80,14 +80,14 @@
         });
 
         if (response.ok) {
-            console.log("Հաջողությամբ ջնջվեց բազայից");
+            console.log("Success to delete from database");
 
             fetchTodos(); 
         } else {
-            console.error("Սերվերը մերժեց ջնջելը");
+            console.error("Failed");
         }
     } catch (err) {
-        console.error("Կապի սխալ:", err);
+        console.error("Connection error:", err);
     }
 }
     </script>

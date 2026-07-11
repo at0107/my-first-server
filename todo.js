@@ -8,8 +8,8 @@ const client = new Client({
     connectionString: connectionString,
 })
 client.connect()
-    .then(() => console.log("Հաջողությամբ միացանք PostgreSql֊ին"))
-    .catch(err => console.error("Միացման սխալ", err));
+    .then(() => console.log("Success to connect PostgreSQL"))
+    .catch(err => console.error("Connect failed", err));
 
 async function setupDatabase() {
     const createTableQuery = `
@@ -21,9 +21,9 @@ async function setupDatabase() {
     `;
     try {
         await client.query(createTableQuery);
-        console.log("Աղյուսակը պատրաստ է:");
+        console.log("Table is ready!");
     } catch (err) {
-        console.error("Աղյուսակի ստեղծման սխալ:", err);
+        console.error("Failed to create table", err);
     }
 }
 
@@ -42,8 +42,8 @@ app.get("/api/todos", async (req, res) => {
         
         res.json(result.rows);
     } catch (err) {
-        console.error("Բազայից կարդալու սխալ:", err);
-        res.status(500).json({ message: "Սերվերի սխալ կայացավ" });
+        console.error("Cant read for database", err);
+        res.status(500).json({ message: "Server error!" });
     }
 });
 
@@ -54,11 +54,11 @@ app.post("/api/todos", async (req, res) => {
     try{
         const result = await client.query(insertQuery, [newTaskText])
         const savedTask = result.rows[0];
-        console.log("Բազայում ավելացավ", savedTask);
-        res.json({message: "Հաջողությամբ պահպանվեց բազայում", data: savedTask})
+        console.log("Add to database", savedTask);
+        res.json({message: "Success to save to database", data: savedTask})
     } catch (err) {
-        console.error("Բազայում պահպանելու սխալ", err);
-        res.status(500).json({message: "Սերվերի սխալ"})
+        console.error("Failed to save to dataabse", err);
+        res.status(500).json({message: "Server error!"})
     }
 })
 
@@ -69,13 +69,13 @@ app.delete("/api/todos/:id", async (req, res) => {
     try {
         await client.query(deleteQuery, [idToDelete]);
         
-        res.json({ message: "Առաջադրանքը հաջողությամբ ջնջվեց" });
+        res.json({ message: "Todo deleted successfully!" });
     } catch (err) {
-        console.error("Ջնջելու սխալ:", err);
-        res.status(500).json({ message: "Սերվերի սխալ կայացավ" });
+        console.error("delete error", err);
+        res.status(500).json({ message: "Server error" });
     }
 });
 
 app.listen(PORT, () => {
-    console.log("Սերվերը միացված է,և պատրաստ է լսելու երկու հարցումներն էլ");
+    console.log("Server can listen all requests");
 })
