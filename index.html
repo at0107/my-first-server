@@ -1,17 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Todo App</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        input, button { padding: 10px; margin: 5px; }
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            margin: 5px;
+        }
     </style>
 </head>
+
 <body>
 
     <h2>Add New Todo</h2>
     <input type="text" id="taskInput" placeholder="Գրիր անելիքդ...">
+    <select name="categories" id="categories">
+        <option value="">Select the category</option>
+    </select>
     <button onclick="sendDataToBackend()">Send to server</button>
     <hr>
     <button onclick="fetchTodos()">Load all todos</button>
@@ -21,11 +34,12 @@
 
     <script>
         function sendDataToBackend() {
-           
+
             const taskText = document.getElementById("taskInput").value;
+            const selectValue = document.getElementById('categories').value;
 
             const newTodo = {
-                id: Math.floor(Math.random() * 1000),  
+                id: Math.floor(Math.random() * 1000),
                 task: taskText,
                 completed: false
             };
@@ -35,61 +49,125 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(newTodo) 
+                body: JSON.stringify({
+                    task: taskText,
+                    category_id: selectValue
+                })
             })
-            .then(response => response.json())
-            .then(data => {
-                
-                document.getElementById("statusMessage").innerText = data.message;
-                document.getElementById("taskInput").value = ""; 
-            })
-            .catch(error => console.error("Failed to send:", error));
+                .then(response => response.json())
+                .then(data => {
+
+                    document.getElementById("statusMessage").innerText = data.message;
+                    document.getElementById("taskInput").value = "";
+                })
+                .catch(error => console.error("Failed to send:", error));
         }
 
 
-        function fetchTodos(){
+        function fetchTodos() {
             fetch('http://localhost:4000/api/todos')
-            .then(response => response.json())
-            .then(data => {
-                const todosContainer = document.getElementById("todosContainer");
-                todosContainer.innerHTML = "";
-                data.forEach(todo => {
-                    const li = document.createElement("li");
-                    li.textContent = todo.task;
+                .then(response => response.json())
+                .then(data => {
+                    const todosContainer = document.getElementById("todosContainer");
+                    todosContainer.innerHTML = "";
+                    data.forEach(todo => {
+                        const li = document.createElement("li");
+                        li.textContent = todo.task + "(" + todo.category_name + ")";
 
-                    const deleteBtn = document.createElement("button");
-                    deleteBtn.innerText = "Delete";
-                    deleteBtn.style.marginLeft = "15px";
-                    deleteBtn.style.color = "red";
-                    deleteBtn.onclick = () => deleteTodoFromServer(todo.id);
-                    li.appendChild(deleteBtn);
-                    todosContainer.appendChild(li);
+                        const completeBtn = document.createElement("button")
+                        completeBtn.innerText = "Complete"
+                        completeBtn.style.marginLeft = "10px"
+                        completeBtn.style.color = "green"
+                        completeBtn.onclick = () => updateTodo(todo.id)
+
+                        if (todo.completed) {
+                            li.style.textDecoration = "line-through"
+                            li.style.color = "gray"
+                            completeBtn.style.display = "none"
+                        }
+
+                        const deleteBtn = document.createElement("button");
+                        deleteBtn.innerText = "Delete";
+                        deleteBtn.style.marginLeft = "15px";
+                        deleteBtn.style.color = "red";
+                        deleteBtn.onclick = () => deleteTodoFromServer(todo.id);
+
+                        li.appendChild(completeBtn)
+                        li.appendChild(deleteBtn);
+                        todosContainer.appendChild(li);
+                    });
+                })
+                .catch(error => console.error("Failed:", error));
+        }
+
+        async function deleteTodoFromServer(todoId) {
+
+            const isConfirmed = confirm("Are you sure to delete this todo?:");
+            if (!isConfirmed) return;
+
+            try {
+                const response = await fetch(`http://localhost:4000/api/todos/${todoId}`, {
+                    method: "DELETE"
                 });
-            })
-            .catch(error => console.error("Failed:", error));
+
+                if (response.ok) {
+                    console.log("Success to delete from database");
+
+                    fetchTodos();
+                } else {
+                    console.error("Failed");
+                }
+            } catch (err) {
+                console.error("Connection error:", err);
+            }
         }
 
-    async function deleteTodoFromServer(todoId) {
-   
-    const isConfirmed = confirm("Are you sure to delete this todo?:");
-    if (!isConfirmed) return; 
+        async function updateTodo(todoId) {
+            try {
+                const response = await fetch(`http://localhost:4000/api/todos/${todoId}`, {
+                    method: "PUT"
+                });
 
-    try {
-        const response = await fetch(`http://localhost:4000/api/todos/${todoId}`, {
-            method: "DELETE" 
-        });
-
-        if (response.ok) {
-            console.log("Success to delete from database");
-
-            fetchTodos(); 
-        } else {
-            console.error("Failed");
+                if (!response.ok) {
+                    console.error("Something went wrong");
+                } else {
+                    console.log("Success to update todo");
+                    fetchTodos();
+                }
+            } catch (err) {
+                console.error("Something went wrong", err);
+            }
         }
-    } catch (err) {
-        console.error("Connection error:", err);
+
+        async function fetchCategories() {
+            try {
+                const response = await fetch("http://localhost:4000/api/categories");
+                if (!response.ok) {
+                    console.error("Something went wrong!");
+                    return;
+                } else {
+                    console.log("Success to fetch the categories");
+
+                }
+
+                const categoriesData = await response.json();
+
+                const categories = document.getElementById('categories');
+                categoriesData.forEach(category => {
+                    const singleCategory = document.createElement('option');
+                    singleCategory.value = category.id
+                    singleCategory.textContent = category.name;
+                    categories.appendChild(singleCategory);
+                })
+            } catch (err) {
+                console.error("Fetch error!", err);
+            }
     }
-}
+
+    fetchTodos()
+    fetchCategories()
+
     </script>
 </body>
+
 </html>
