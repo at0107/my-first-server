@@ -89,20 +89,21 @@ app.delete("/api/todos/:id", async (req:Request, res:Response) => {
     }
 });
 
-app.put('/api/todos/:id', async (req:Request, res:Response) => {
-    const updateId = req.params.id;
-    const updateQuery = `UPDATE todos SET completed = TRUE WHERE id = $1`
-    try {
-        const result = await client.query(updateQuery, [updateId])
-        if(result.rowCount === 0){
-            return res.status(404).json({message: "The todo is not found"})
-        }
-        res.json({ message: "Todo updated successfully!" })
-    } catch (err:any) {
-        console.error("Something went wrong");
-        res.status(500).json({ message: "Server error" })
-    }
-})
+app.put("/api/todos/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { completed } = req.body; 
+
+  try {
+    await client.query(
+      "UPDATE todos SET completed = $1 WHERE id = $2",
+      [completed, id]
+    );
+    res.json({ message: "Success to update" });
+  } catch (err: any) {
+    console.error("Failed to update status", err);
+    res.status(500).json({ message: "Server error!" });
+  }
+});
 
 app.listen(PORT, () => {
     console.log("Server can listen all requests");
