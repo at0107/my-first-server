@@ -13,9 +13,12 @@ export default function AddTodo({ categories }: { categories: any[] }) {
     e.preventDefault();
     if (!task.trim()) return;
 
-    await fetch("http://127.0.0.1:4000/api/todos", {
+    const token = localStorage.getItem("token")
+    const response = await fetch("http://127.0.0.1:4000/api/todos", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json",
+      "Authorization" : `Bearer ${token}`
+      },
       body: JSON.stringify({ task: task, category_id: categoryId }), 
     });
 
