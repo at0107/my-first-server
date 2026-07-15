@@ -37,7 +37,7 @@ export default function Login(){
                 <input type="text" onChange={(e) => setUsername(e.target.value)} value={username}   id="name" placeholder="Please write your username" className="p-4 border rounded-md cursor-pointer"/>
                 <input type="password" onChange={(e) => setPassword(e.target.value)} value={password} id="password" placeholder="Please write your password" className="p-4 border rounded-md cursor-pointer"/>
                 <button type="submit" disabled={isLoading} className="p-4 border rounded-md cursor-pointer bg-blue-500 font-bold text-xl">{isLoading ? "Please wait" : "Login"}</button>
-                <div className="mt-4 text-center">
+                <div className="mt-4 text-center flex flex-col">
                     <span className="text-gray-600">
                         Don't have an account yet?
                     </span>
