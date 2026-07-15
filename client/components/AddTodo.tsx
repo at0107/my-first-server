@@ -2,16 +2,23 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 
 export default function AddTodo({ categories }: { categories: any[] }) {
   const [task, setTask] = useState("");
   const [categoryId, setCategoryId] = useState(categories[0]?.id || "");
+  const [isLoading,setIsLoading] = useState(false)
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!task.trim()) return;
+    setIsLoading(true)
+    if (!task.trim()) {
+      toast.error("Something went wrong")
+      setIsLoading(false)
+      return
+    };
 
     const token = localStorage.getItem("token")
     const response = await fetch("http://127.0.0.1:4000/api/todos", {
@@ -21,7 +28,8 @@ export default function AddTodo({ categories }: { categories: any[] }) {
       },
       body: JSON.stringify({ task: task, category_id: categoryId }), 
     });
-
+    toast.success("New todo added successfully!")
+    setIsLoading(false)
     setTask(""); 
     router.refresh();
   };
@@ -49,10 +57,10 @@ export default function AddTodo({ categories }: { categories: any[] }) {
       </select>
 
       <button 
-        type="submit" 
+        type="submit" disabled={isLoading}
         className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition whitespace-nowrap"
       >
-        Add
+        {!isLoading ? "Add new todo" : "Wait please."}
       </button>
     </form>
   );
