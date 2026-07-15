@@ -7,7 +7,7 @@ export default function ToggleStatus({ id, completed }: { id: number, completed:
 
   const handleToggle = async () => {
     try {
-      await fetch(`http://127.0.0.1:4000/api/todos/${id}`, {
+      await fetch(`https://todo-backend-api-zyc9.onrender.com/api/todos/${id}`, {
         method: "PUT", 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ completed: !completed }),

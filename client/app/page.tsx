@@ -7,7 +7,7 @@ import { CategoryFilter } from "@/components/CategoryFilter";
 export default async function Home({ searchParams }: { searchParams: Promise<{ categoryId?: string }> }) {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value
-  const res = await fetch('http://localhost:4000/api/todos',
+  const res = await fetch('https://todo-backend-api-zyc9.onrender.com/api/todos',
     {
       cache: 'no-store',
       method: "GET",
@@ -21,7 +21,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ c
   console.log("Fetched datas",todos);
   const params = await searchParams
 
-  const catRes = await fetch('http://localhost:4000/api/categories', { cache: 'no-store' });
+  const catRes = await fetch('https://todo-backend-api-zyc9.onrender.com/api/categories', { cache: 'no-store' });
   const categories = await catRes.json();
 
   const filteredTodos = params.categoryId ? todos.filter((todo: any) => todo.category_id === Number(params.categoryId)) : todos

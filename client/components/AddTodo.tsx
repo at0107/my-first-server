@@ -21,13 +21,16 @@ export default function AddTodo({ categories }: { categories: any[] }) {
     };
 
     const token = localStorage.getItem("token")
-    const response = await fetch("http://127.0.0.1:4000/api/todos", {
+    const response = await fetch("https://todo-backend-api-zyc9.onrender.com/api/todos", {
       method: "POST",
       headers: { "Content-Type": "application/json",
       "Authorization" : `Bearer ${token}`
       },
       body: JSON.stringify({ task: task, category_id: categoryId }), 
     });
+    if(!response.ok){
+      throw new Error("Something went wrong.")
+    }
     toast.success("New todo added successfully!")
     setIsLoading(false)
     setTask(""); 

@@ -16,7 +16,7 @@ export default function DeleteButton({ id }: { id: number }) {
     };
 
     try {
-      await fetch(`http://localhost:4000/api/todos/${id}`, {
+      await fetch(`https://todo-backend-api-zyc9.onrender.com/api/todos/${id}`, {
         method: "DELETE",
       });
       toast.success("You delete your todo successfully!")
