@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export default function Register() {
     const[username,setUsername] = useState("")
@@ -32,6 +33,14 @@ export default function Register() {
                 <input type="text" value={username} id="name" onChange={(e) => setUsername(e.target.value)} placeholder="Please choose your username" className="p-4 border rounded-md cursor-pointer"/>
                 <input type="password" onChange={(e) => setPassword(e.target.value)} value={password} id="name" placeholder="Please choose your password" className="p-4 border rounded-md cursor-pointer"/>
                 <button type="submit" className="p-4 border rounded-md cursor-pointer bg-blue-500 font-bold text-xl">Create Account</button>
+                <div className="mt-4 text-center">
+                    <span className="text-gray-600">
+                        Already have an account?
+                    </span>
+                    <Link href="/login" className="text-blue-500 hover:underline" >
+                        Login now
+                    </Link>
+                </div>
             </form>
         </main>
     )

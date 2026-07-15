@@ -2,6 +2,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
+import Link from "next/link"
 
 export default function Login(){
     const[username,setUsername] = useState("")
@@ -36,6 +37,14 @@ export default function Login(){
                 <input type="text" onChange={(e) => setUsername(e.target.value)} value={username}   id="name" placeholder="Please write your username" className="p-4 border rounded-md cursor-pointer"/>
                 <input type="password" onChange={(e) => setPassword(e.target.value)} value={password} id="password" placeholder="Please write your password" className="p-4 border rounded-md cursor-pointer"/>
                 <button type="submit" disabled={isLoading} className="p-4 border rounded-md cursor-pointer bg-blue-500 font-bold text-xl">{isLoading ? "Please wait" : "Login"}</button>
+                <div className="mt-4 text-center">
+                    <span className="text-gray-600">
+                        Don't have an account yet?
+                    </span>
+                    <Link href="/register" className="text-blue-500 hover:underline" >
+                    Register now
+                    </Link>
+                </div>
             </form>
         </main>
     )
